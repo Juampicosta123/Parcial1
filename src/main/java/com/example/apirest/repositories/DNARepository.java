@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface DNARepository extends JpaRepository<DNA, Long> {
     Optional<DNA> getBySequence(String[] sequence);
+    int countByIsMutant(Boolean bool);
 }

@@ -20,6 +20,7 @@ public class DNA implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Boolean isMutant;
+    @Column(name = "sequence", unique = true)
     private String[] sequence;
     private String description;
 }
