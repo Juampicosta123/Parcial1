@@ -19,24 +19,51 @@ public class DNAService {
     @Transactional
     public DNAShort checkIsMutant(String[] sequence) throws Exception {
         try {
+
+            // Error si el array está vacío
+            if(sequence.length == 0) throw new Exception("El array no debe estar vacío");
+            for (int row = 0; row < sequence.length; row++) {
+                char[] dnaRow = sequence[row].toCharArray();
+
+                // Error si la matriz no es de nxn
+                if(sequence.length != dnaRow.length) throw new Exception("La matriz debe ser de nxn");
+
+                // Error si el array no incluye una letra válida
+                char[] validLetters = {'A', 'C', 'G', 'T'};
+
+                for (char character : dnaRow) {
+                    boolean isValid = false;
+                    for (char validLetter : validLetters) {
+                        if (character == validLetter) {
+                            isValid = true;
+                            break;
+                        }
+                    }
+                    if (!isValid) {
+                        System.out.println("Carácter inválido encontrado: " + character);
+                        throw new Exception("Carácter inválido encontrado: " + character);
+                    }
+                }
+            }
+
             Optional<DNA> existingDNA = DNARepository.getBySequence(sequence);
             DNAShort dnaDtoShort = new DNAShort();
             if (existingDNA.isPresent()) {
                 // Si ya existe lo devuelvo
-                dnaDtoShort.setIsMutant(existingDNA.get().getIsMutant());
-                dnaDtoShort.setDescription(existingDNA.get().getDescription());
+                boolean isMutant = existingDNA.get().getIsMutant();
+                dnaDtoShort.setIsMutant(isMutant);
+                String description = isMutant ? "Mutante detectado" : "No es mutante";
+
+                dnaDtoShort.setDescription(description);
                 return dnaDtoShort;
             } else {
                 // Verificar si es mutante
-                Optional<String> result = MutantChecker.isMutant(sequence);
-
-                Boolean isMutant = result.isPresent();
-                String description = result.orElse("No es mutante");
+                boolean isMutant = MutantChecker.isMutant(sequence);
+                String description = isMutant ? "Mutante detectado" : "No es mutante";
 
                 // Crear nuevo DNA
                 DNA dna = new DNA();
                 dna.setIsMutant(isMutant);
-                dna.setDescription(description);
                 dna.setSequence(sequence);
 
                 DNARepository.save(dna);

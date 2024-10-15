@@ -1,116 +1,93 @@
 package com.example.apirest.utils;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MutantChecker {
 
     private static final int MIN_CONSECUTIVE = 4;
 
-    public static Optional<String> isMutant(String[] dna) {
-        Optional<String> result;
+    public static boolean isMutant(String[] dna) {
+        // Mapa para contar las secuencias por cada letra
+        Map<Character, Integer> sequenceCounts = new HashMap<>();
 
-        // Verifica filas
-        result = checkRows(dna);
-        if (result.isPresent()) {
-            return Optional.of("Mutante detectado: " + result.get());
-        }
+        // Contar secuencias en filas, columnas y diagonales
+        searchRowSequences(dna, sequenceCounts);
+        searchColumnSequences(dna, sequenceCounts);
+        searchDiagonalSequences(dna, sequenceCounts);
 
-        // Verifica columnas
-        result = checkColumns(dna);
-        if (result.isPresent()) {
-            return Optional.of("Mutante detectado: " + result.get());
-        }
-
-        // Verifica diagonal principal
-        result = checkDiagonal(dna);
-        if (result.isPresent()) {
-            return Optional.of("Mutante detectado: " + result.get());
-        }
-
-        // Verifica diagonal inversa
-        result = checkInverseDiagonal(dna);
-        if (result.isPresent()) {
-            return Optional.of("Mutante detectado: " + result.get());
-        }
-
-        // Si no se encuentra ninguna secuencia mutante
-        return Optional.of("No es mutante");
+        // Verificar si hay al menos dos secuencias de letras diferentes
+        return hasAtLeastTwoDistinctSequences(sequenceCounts);
     }
 
-    private static Optional<String> checkRows(String[] dna) {
-        for (int row = 0; row < dna.length; row++) {
-            if (hasConsecutive(dna[row].toCharArray())) {
-                return Optional.of("Fila " + row);
-            }
+    private static void searchRowSequences(String[] dna, Map<Character, Integer> sequenceCounts) {
+        for (String row : dna) {
+            checkAndStoreSequence(row.toCharArray(), sequenceCounts);
         }
-        return Optional.empty();
     }
 
-    private static Optional<String> checkColumns(String[] dna) {
+    private static void searchColumnSequences(String[] dna, Map<Character, Integer> sequenceCounts) {
         int length = dna[0].length();
         for (int col = 0; col < length; col++) {
             StringBuilder column = new StringBuilder();
             for (String row : dna) {
                 column.append(row.charAt(col));
             }
-            if (hasConsecutive(column.toString().toCharArray())) {
-                return Optional.of("Columna " + col);
-            }
+            checkAndStoreSequence(column.toString().toCharArray(), sequenceCounts);
         }
-        return Optional.empty();
     }
 
-    private static Optional<String> checkDiagonal(String[] dna) {
+    private static void searchDiagonalSequences(String[] dna, Map<Character, Integer> sequenceCounts) {
         int size = dna.length;
+
+        // Diagonales principales (de arriba hacia abajo)
         for (int i = 0; i <= size - MIN_CONSECUTIVE; i++) {
             for (int j = 0; j <= dna[i].length() - MIN_CONSECUTIVE; j++) {
-                if (hasConsecutiveInDiagonal(dna, i, j, 1)) {
-                    return Optional.of("Diagonal principal desde (" + i + "," + j + ")");
-                }
+                checkDiagonal(dna, i, j, 1, sequenceCounts);
             }
         }
-        return Optional.empty();
-    }
 
-    private static Optional<String> checkInverseDiagonal(String[] dna) {
-        int size = dna.length;
+        // Diagonales inversas (de abajo hacia arriba)
         for (int i = 0; i <= size - MIN_CONSECUTIVE; i++) {
             for (int j = MIN_CONSECUTIVE - 1; j < dna[i].length(); j++) {
-                if (hasConsecutiveInDiagonal(dna, i, j, -1)) {
-                    return Optional.of("Diagonal inversa desde (" + i + "," + j + ")");
-                }
+                checkDiagonal(dna, i, j, -1, sequenceCounts);
             }
         }
-        return Optional.empty();
     }
 
-    private static boolean hasConsecutive(char[] sequence) {
+    private static void checkAndStoreSequence(char[] sequence, Map<Character, Integer> sequenceCounts) {
         int count = 1;
         for (int i = 1; i < sequence.length; i++) {
             if (sequence[i] == sequence[i - 1]) {
                 count++;
                 if (count >= MIN_CONSECUTIVE) {
-                    return true;
+                    sequenceCounts.merge(sequence[i], 1, Integer::sum);
+                    break; // Deja de buscar más en esta secuencia
                 }
             } else {
                 count = 1;
             }
         }
-        return false;
     }
 
-    private static boolean hasConsecutiveInDiagonal(String[] dna, int startRow, int startCol, int direction) {
+    private static void checkDiagonal(String[] dna, int startRow, int startCol, int direction, Map<Character, Integer> sequenceCounts) {
         int count = 1;
         for (int k = 1; k < MIN_CONSECUTIVE; k++) {
-            if (dna[startRow + k].charAt(startCol + k * direction) == dna[startRow + k - 1].charAt(startCol + (k - 1) * direction)) {
+            if (dna[startRow + k].charAt(startCol + k * direction) ==
+                    dna[startRow + k - 1].charAt(startCol + (k - 1) * direction)) {
                 count++;
                 if (count >= MIN_CONSECUTIVE) {
-                    return true;
+                    sequenceCounts.merge(dna[startRow + k].charAt(startCol + k * direction), 1, Integer::sum);
+                    break;
                 }
             } else {
                 count = 1;
             }
         }
-        return false;
+    }
+
+    private static boolean hasAtLeastTwoDistinctSequences(Map<Character, Integer> sequenceCounts) {
+        // Verificar si hay al menos dos letras distintas con secuencias válidas
+        return sequenceCounts.size() >= 2;
     }
 }

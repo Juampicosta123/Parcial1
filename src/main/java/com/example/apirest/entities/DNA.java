@@ -22,5 +22,4 @@ public class DNA implements Serializable {
     private Boolean isMutant;
     @Column(name = "sequence", unique = true)
     private String[] sequence;
-    private String description;
 }
