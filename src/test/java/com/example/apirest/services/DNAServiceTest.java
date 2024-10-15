@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class DNAServiceTest {
@@ -67,6 +66,81 @@ public class DNAServiceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    public void shouldIdentifyMutantThree() {
+        String[] dna = {"TCGGGTGAT", "TGATCCTTT", "TACGAGTGA", "AAATGTACG", "ACGAGTGCT", "AGACACATG", "GAATTCCAA", "ACTACGACC", "TGAGTATCC"};
+        try {
+            assertTrue(dnaService.checkIsMutant(dna).getIsMutant(),
+                    "La secuencia debe identificarse como mutante.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldIdentifyMutantFour() {
+        String[] dna = {"TTTTTTTTT", "TTTTTTTTT", "TTTTTTTTT", "TTTTTTTTT", "CCGACCAGT", "GGCACTCCA", "AGGACACTA", "CAAAGGCAT", "GCAGTCCCC"};
+        try {
+            assertTrue(dnaService.checkIsMutant(dna).getIsMutant(),
+                    "La secuencia debe identificarse como mutante.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForEmptyArray() {
+        String[] dna = {};
+        assertThrows(Exception.class, () -> {
+            dnaService.checkIsMutant(dna);
+        }, "El array no debe estar vacío");
+    }
+
+    // Test para recibir un array de NxM en vez de un NxN
+    @Test
+    public void shouldThrowExceptionForNonSquareArray() {
+        String[] dna = {"A", "AA"}; // Ejemplo de NxM
+        assertThrows(Exception.class, () -> {
+            dnaService.checkIsMutant(dna);
+        }, "El array debe ser de NxN");
+    }
+
+    // Test para recibir un array de números
+    @Test
+    public void shouldThrowExceptionForArrayWithNumbers() {
+        String[] dna = {"A1G3", "TTT3", "GACG", "GTTA"};
+        assertThrows(Exception.class, () -> {
+            dnaService.checkIsMutant(dna);
+        }, "El array solo debe contener 'A', 'T', 'C' o 'G'");
+    }
+
+    // Test para recibir null
+    @Test
+    public void shouldThrowExceptionForNullInput() {
+        String[] dna = null;
+        assertThrows(Exception.class, () -> {
+            dnaService.checkIsMutant(dna);
+        }, "La entrada no puede ser null");
+    }
+
+    // Test para recibir un array de NxN de nulls
+    @Test
+    public void shouldThrowExceptionForArrayWithNulls() {
+        String[] dna = {null, null, null};
+        assertThrows(Exception.class, () -> {
+            dnaService.checkIsMutant(dna);
+        }, "El array no puede contener nulls");
+    }
+
+    // Test para recibir un array de NxN con letras distintas a las propuestas {“B”, “H”}
+    @Test
+    public void shouldThrowExceptionForInvalidCharacters() {
+        String[] dna = {"ABCD", "EFGH", "IJKL", "MNOP"};
+        assertThrows(Exception.class, () -> {
+            dnaService.checkIsMutant(dna);
+        }, "El array solo debe contener 'A', 'T', 'C' o 'G'");
     }
 
 
