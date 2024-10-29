@@ -56,7 +56,7 @@ Este proyecto es una API desarrollada en **Spring Boot** y gestionada con **Grad
 | GET   |  /api/stats/  |   Devuelve una estadística con la cantidad de mutantes y humanos |
 ---
 ## **URL API**
-[URL API EN RENDER]([https://example.com](https://parcial1-6j43.onrender.com))
+[URL API EN RENDER](https://parcial1-6j43.onrender.com)
 ---
 
 
