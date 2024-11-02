@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 
 public class DNAStats {
-    private int count_mutant_dna;
-    private int count_human_dna;
+    private int countMutantDna;
+    private int countHumanDna;
     private float ratio;
 }

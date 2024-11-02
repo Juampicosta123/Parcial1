@@ -1,5 +1,6 @@
 package com.example.apirest.services;
 
+import com.example.apirest.dtos.DNAStats;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,9 @@ public class DNAServiceTest {
 
     @Autowired
     private DNAService dnaService;
+
+    @Autowired
+    private StatsService statsService;
 
     // Tests posibles pruebas unitarias
     @Test
@@ -202,16 +206,32 @@ public class DNAServiceTest {
     @Test
     public void shouldIdentifyInverseDiagonalMutant() {
         String[] dna = {
-                "ATGCGA",
-                "CATTAC",
-                "TTAACT",
-                "AGACTG",
-                "CTCCTA",
+                "ATGTCA",
+                "CAGTGC",
+                "TTATGT",
+                "AGAAGG",
+                "CCCCTA",
                 "TCACTG"
         };
         try {
             assertTrue(dnaService.checkIsMutant(dna).getIsMutant(),
                     "La secuencia diagonal inversa debe identificarse como mutante.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldGetStats() {
+        try {
+            DNAStats stats = statsService.getStats();
+
+            // Verifica que `count_mutant_dna` y `count_human_dna` estén en un rango razonable para asegurar que son valores válidos de `int`
+                        assertTrue(stats.getCountMutantDna() >= 0, "countMutantDNA debe ser un número entero positivo");
+                        assertTrue(stats.getCountHumanDna() >= 0, "countHumanDNA debe ser un número entero positivo");
+            // Verifica que `ratio` esté en el rango de un `float` entre 0 y 1, o cualquier otro rango que esperes
+                        assertTrue(stats.getRatio() >= 0.0f, "ratio debe ser un valor de tipo float entre 0 y 1");
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

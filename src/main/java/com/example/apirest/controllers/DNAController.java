@@ -18,7 +18,7 @@ public class DNAController {
     @PostMapping("/")
     public ResponseEntity<?> checkIsMutant(@RequestBody DNARequest request) {
         try {
-            DNAShort dnaShort = dnaService.checkIsMutant(request.getDna().toArray(new String[0]));
+                DNAShort dnaShort = dnaService.checkIsMutant(request.getDna());
             return ResponseEntity.status(HttpStatus.OK).body(dnaShort.toString());
         } catch (Exception e) {
             e.printStackTrace();

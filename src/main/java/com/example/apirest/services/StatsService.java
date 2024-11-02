@@ -20,8 +20,8 @@ public class StatsService {
             float ratio = humansQuantity > 0 ? (float) mutantQuantity / humansQuantity : 0;
 
             DNAStats dnaStatsDto = new DNAStats();
-            dnaStatsDto.setCount_mutant_dna(mutantQuantity);
-            dnaStatsDto.setCount_human_dna(humansQuantity);
+            dnaStatsDto.setCountMutantDna(mutantQuantity);
+            dnaStatsDto.setCountHumanDna(humansQuantity);
             dnaStatsDto.setRatio(ratio);
             return dnaStatsDto;
         } catch (Exception e) {

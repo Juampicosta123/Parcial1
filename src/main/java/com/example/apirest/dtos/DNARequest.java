@@ -12,5 +12,5 @@ import java.util.List;
 @ToString
 
 public class DNARequest {
-    private List<String> dna;
+    private String[] dna;
 }
